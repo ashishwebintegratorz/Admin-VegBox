@@ -121,7 +121,7 @@ export default function BasicTableOne() {
         <input
           type="number"
           placeholder="Min Price"
-          className="px-3 py-2 border rounded text-gray-500 text-theme-xs dark:text-gray-400 appearance:textfield"
+          className="px-3 py-2 border rounded dark:bg-gray-900 dark:border-gray-800 bg-transparent text-gray-500 text-theme-xs dark:text-gray-400 appearance:textfield"
           value={minPrice}
           onChange={(e) => {
             setMinPrice(e.target.value);
@@ -132,7 +132,7 @@ export default function BasicTableOne() {
         <input
           type="number"
           placeholder="Max Price"
-          className="px-3 py-2 border rounded text-gray-500 text-theme-xs dark:text-gray-400 appearance:textfield"
+          className="px-3 py-2 border rounded dark:bg-gray-900 dark:border-gray-800 text-gray-500 text-theme-xs dark:text-gray-400 appearance:textfield"
           value={maxPrice}
           onChange={(e) => {
             setMaxPrice(e.target.value);
@@ -143,7 +143,7 @@ export default function BasicTableOne() {
         <input
           type="number"
           placeholder="Min Stock"
-          className="px-3 py-2 border rounded text-gray-500 text-theme-xs dark:text-gray-400 appearance:textfield"
+          className="px-3 py-2 border rounded dark:bg-gray-900 dark:border-gray-800 text-gray-500 text-theme-xs dark:text-gray-400 appearance:textfield"
           value={minStock}
           onChange={(e) => {
             setMinStock(e.target.value);
@@ -152,7 +152,7 @@ export default function BasicTableOne() {
         />
 
         <select
-          className="px-3 py-2 border rounded text-gray-500 text-theme-xs dark:text-gray-400"
+          className="px-3 py-2 border rounded border-gray-dark text-gray-500 text-theme-xs dark:text-gray-400"
           value={status}
           onChange={(e) => {
             setStatus(e.target.value);
