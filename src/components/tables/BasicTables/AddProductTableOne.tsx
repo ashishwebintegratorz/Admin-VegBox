@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "../../ui/table";
 import Button from "../../ui/button/Button";
+import { PencilIcon, TrashBinIcon } from "../../../icons";
 
 import Badge from "../../ui/badge/Badge";
 
@@ -24,6 +25,11 @@ const AddProductTableOne = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [showModal, setShowModal] = useState(false);
 
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [limit] = useState(5);
+  const [totalPages, setTotalPages] = useState(1);
+
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -37,8 +43,15 @@ const AddProductTableOne = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get(`${BaseUrl}/products/all`);
+      const res = await axios.get(`${BaseUrl}/products/all`, {
+        params: {
+          page,
+          limit,
+        },
+      });
+
       setProducts(res.data.products);
+      setTotalPages(res.data.totalPages);
     } catch (err) {
       console.error("Failed to load products", err);
     }
@@ -46,7 +59,7 @@ const AddProductTableOne = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [page]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -120,6 +133,12 @@ const AddProductTableOne = () => {
                   >
                     Status
                   </TableCell>
+                  <TableCell
+                    isHeader
+                    className="px-5 py-3 text-gray-500 text-theme-xs dark:text-gray-400 text-center"
+                  >
+                    Actions
+                  </TableCell>
                 </TableRow>
               </TableHeader>
 
@@ -137,12 +156,11 @@ const AddProductTableOne = () => {
                             <div
                               key={i}
                               className="w-8 h-8 rounded-full overflow-hidden border-2 border-white dark:border-gray-900 
-                     flex items-center justify-center bg-gray-100"
+                              flex items-center justify-center bg-gray-100"
                             >
                               <img
                                 src={img}
-                                alt="product"
-                                className="max-w-full max-h-full object-contain object-center"
+                                className="w-full h-full object-cover"
                               />
                             </div>
                           ))}
@@ -150,14 +168,15 @@ const AddProductTableOne = () => {
                       </div>
                     </TableCell>
 
-                    <TableCell className="px-4 py-3 text-gray-500 text-theme-xs dark:text-gray-400 text-center">
+                    <TableCell className="px-4 py-3 text-center text-gray-500 text-theme-xs dark:text-gray-400">
                       {p.stock}
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-gray-500 text-theme-xs dark:text-gray-400 text-center">
+
+                    <TableCell className="px-4 py-3 text-center text-gray-500 text-theme-xs dark:text-gray-400">
                       ₹{p.price}
                     </TableCell>
 
-                    <TableCell className="px-4 py-3 text-gray-500 text-theme-xs dark:text-gray-400 text-center">
+                    <TableCell className="px-4 py-3 text-center">
                       <Badge
                         size="sm"
                         color={p.stock > 0 ? "success" : "error"}
@@ -165,32 +184,78 @@ const AddProductTableOne = () => {
                         {p.stock > 0 ? "Available" : "Out of Stock"}
                       </Badge>
                     </TableCell>
+
+                    {/* ----------- ACTION BUTTONS ----------- */}
+                    <TableCell className="px-4 py-3 text-center flex items-center justify-center gap-2">
+                      {/* EDIT BUTTON — now using your PencilIcon */}
+                      <button
+                        onClick={() => console.log("edit", p._id)}
+                        className="p-2 rounded-md bg-yellow-400/20 hover:bg-yellow-400/30 text-yellow-600 dark:text-yellow-400"
+                        title="Edit Product"
+                      >
+                        <PencilIcon className="w-4 h-4" />
+                      </button>
+
+                      {/* DELETE BUTTON — now using your TrashBinIcon */}
+                      <button
+                        onClick={async () => {
+                          await axios.delete(`${BaseUrl}/products/${p._id}`);
+                          fetchProducts();
+                        }}
+                        className="p-2 rounded-md bg-red-500/20 hover:bg-red-500/30 text-red-600 dark:text-red-400"
+                        title="Delete Product"
+                      >
+                        <TrashBinIcon className="w-4 h-4" />
+                      </button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </div>
         </div>
+
+        {/* Pagination */}
+        <div className="flex justify-end items-center gap-2 mt-4">
+          <button
+            disabled={page <= 1}
+            onClick={() => setPage(page - 1)}
+            className="px-3 py-1 border rounded disabled:opacity-30 text-gray-700 dark:text-gray-400"
+          >
+            Prev
+          </button>
+
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            Page {page} of {totalPages}
+          </span>
+
+          <button
+            disabled={page >= totalPages}
+            onClick={() => setPage(page + 1)}
+            className="px-3 py-1 border rounded disabled:opacity-30 text-gray-700 dark:text-gray-400"
+          >
+            Next
+          </button>
+        </div>
       </div>
 
       {/* --- MODAL POPUP --- */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-100000">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-[430px] shadow-xl">
             <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
               Add Product
             </h2>
 
-            {/* FORM */}
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* NAME */}
               <div>
-                <label className=" text-gray-500 text-theme-xs dark:text-gray-400">
+                <label className="text-gray-600 text-theme-xs dark:text-gray-400">
                   Product Name
                 </label>
                 <input
                   type="text"
-                  className="w-full mt-1 px-3 py-2 border rounded  text-gray-500 text-theme-xs dark:text-gray-400"
+                  className="w-full mt-1 px-3 py-2 border rounded text-gray-700 dark:text-gray-400"
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
@@ -199,12 +264,12 @@ const AddProductTableOne = () => {
 
               {/* PRICE */}
               <div>
-                <label className=" text-gray-500 text-theme-xs dark:text-gray-400">
+                <label className="text-gray-600 text-theme-xs dark:text-gray-400">
                   Price
                 </label>
                 <input
                   type="number"
-                  className="w-full mt-1 px-3 py-2 border rounded  text-gray-500 text-theme-xs dark:text-gray-400"
+                  className="w-full mt-1 px-3 py-2 border rounded text-gray-700 dark:text-gray-400"
                   onChange={(e) =>
                     setFormData({ ...formData, price: e.target.value })
                   }
@@ -213,46 +278,29 @@ const AddProductTableOne = () => {
 
               {/* STOCK */}
               <div>
-                <label className=" text-gray-500 text-theme-xs dark:text-gray-400">
+                <label className="text-gray-600 text-theme-xs dark:text-gray-400">
                   Stock
                 </label>
                 <input
                   type="number"
-                  className="w-full mt-1 px-3 py-2 border rounded  text-gray-500 text-theme-xs dark:text-gray-400"
+                  className="w-full mt-1 px-3 py-2 border rounded text-gray-700 dark:text-gray-400"
                   onChange={(e) =>
                     setFormData({ ...formData, stock: e.target.value })
                   }
                 />
               </div>
 
-              {/* UPLOAD INPUT WITH ICON */}
+              {/* IMAGE UPLOAD */}
               <div>
-                <label className="text-sm text-gray-700 dark:text-gray-300">
+                <label className="text-gray-600 text-theme-xs dark:text-gray-400">
                   Upload Images
                 </label>
 
                 <label
                   htmlFor="uploadImages"
-                  className="mt-2 flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed border-gray-400 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                  className="mt-2 flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed border-gray-400 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-400"
                 >
-                  {/* Upload Icon */}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 text-blue-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 12v9m0-9l-3-3m3 3l3-3"
-                    />
-                  </svg>
-                  <span className="text-gray-600 dark:text-gray-300">
-                    Click to upload
-                  </span>
+                  📤 Upload Images
                 </label>
 
                 <input
@@ -263,12 +311,10 @@ const AddProductTableOne = () => {
                   onChange={(e) => {
                     setImages(e.target.files);
 
-                    const files = e.target.files;
                     const previews: string[] = [];
-
-                    if (files) {
-                      for (let i = 0; i < files.length; i++) {
-                        previews.push(URL.createObjectURL(files[i]));
+                    if (e.target.files) {
+                      for (let i = 0; i < e.target.files.length; i++) {
+                        previews.push(URL.createObjectURL(e.target.files[i]));
                       }
                     }
                     setPreview(previews);
@@ -276,7 +322,7 @@ const AddProductTableOne = () => {
                 />
               </div>
 
-              {/* PREVIEW IMAGES */}
+              {/* IMAGE PREVIEW */}
               {preview.length > 0 && (
                 <div className="grid grid-cols-4 gap-3 mt-3">
                   {preview.map((img, i) => (
