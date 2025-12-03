@@ -776,3 +776,41 @@ span.flatpickr-weekday,
 .simplebar-scrollbar.simplebar-visible:before {
   @apply opacity-100;
 }
+.table-scrollbar {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #4b5563 #ffffff; /* thumb, track */
+}
+
+.table-scrollbar::-webkit-scrollbar {
+  height: 10px; /* horizontal scrollbar height */
+}
+
+.table-scrollbar::-webkit-scrollbar-track {
+  background: #000000; /* near-black to match your UI */
+  border-radius: 9999px;
+}
+
+.table-scrollbar::-webkit-scrollbar-thumb {
+  background: #4b5563; /* gray-600 thumb */
+  border-radius: 9999px;
+}
+
+.table-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #6b7280; /* lighter on hover */
+}
+
+.dark .table-scrollbar {
+  scrollbar-color: #4b5563 #080808;
+}
+
+.dark .table-scrollbar::-webkit-scrollbar-track {
+  background: #080808;
+}
+
+.dark .table-scrollbar::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+.dark .table-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
