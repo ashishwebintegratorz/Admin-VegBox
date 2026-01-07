@@ -9,7 +9,7 @@ import {
 import { Pagination } from "../ui/pagination/Pagination";
 import Avatar from "../ui/avatar/Avatar";
 import ModalWrapper from "../../layout/ModalWrapper.tsx";
-import { useOrders, useDriversList, useAssignDriver, useUpdateOrderStatus } from "../../hooks/useApiHooks";
+import { useOrders, useFreeDriversList, useAssignDriver, useUpdateOrderStatus } from "../../hooks/useApiHooks";
 
 type OrderRow = {
   _id: string;
@@ -28,7 +28,7 @@ type OrderRow = {
 
 export default function OrderTable() {
   const { data: apiOrders, isLoading: isLoadingOrders } = useOrders();
-  const { data: drivers } = useDriversList();
+  const { data: drivers } = useFreeDriversList();
   
   const assignDriverMutation = useAssignDriver();
   const updateStatusMutation = useUpdateOrderStatus();
@@ -89,14 +89,20 @@ export default function OrderTable() {
     if (!selectedOrder) return;
 
     try {
-      const drId = typeof selectedOrder.assignedDriver === 'object' ? selectedOrder.assignedDriver._id : selectedOrder.assignedDriver;
-      if (newDriverId !== drId) {
+      // Get the existing driver ID from the order object
+      const currentDriverId = typeof selectedOrder.assignedDriver === 'object' 
+        ? selectedOrder.assignedDriver._id 
+        : selectedOrder.assignedDriver || "";
+
+      // 1. Update Driver if changed
+      if (newDriverId !== currentDriverId) {
         await assignDriverMutation.mutateAsync({ 
           orderId: selectedOrder._id, 
           driverId: newDriverId 
         });
       }
 
+      // 2. Update Status if changed
       if (newOrderStatus !== selectedOrder.status || newDeliveryStatus !== selectedOrder.deliveryStatus) {
         await updateStatusMutation.mutateAsync({
           orderId: selectedOrder._id,
@@ -106,9 +112,10 @@ export default function OrderTable() {
       }
 
       setIsManageModalOpen(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to update order:", error);
-      alert("Error updating order. Please try again.");
+      const errorMessage = error?.response?.data?.message || "Error updating order. Please try again.";
+      alert(errorMessage);
     }
   };
 

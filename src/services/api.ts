@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:5000/api/v1";
+const API_BASE_URL = import.meta.env.VITE_BASIC_API_URL || "http://localhost:5000/api";
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -33,13 +33,14 @@ export const authService = {
 
 export const userService = {
     getProfile: () => api.get("/user/me"),
+};
 
+export const driverService = {
+    getAllDrivers: () => api.get("/drivers/all"),
+    getFreeDrivers: () => api.get("/drivers/free"),
     toggleOnline: (isOnline: boolean) =>
-        api.put("/user/toggle-online", { isOnline }),
-
-    reachedStore: () => api.put("/user/reached-store"),
-
-    getDrivers: () => api.get("/user/drivers"),
+        api.put("/drivers/toggle-online", { isOnline }),
+    reachedStore: () => api.put("/drivers/reached-store"),
 };
 
 export const orderService = {

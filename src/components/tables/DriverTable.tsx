@@ -138,9 +138,19 @@ export default function DriverTable() {
                     </TableCell>
 
                     <TableCell className="px-6 py-4 text-sm font-bold">
-                      <span className={`inline-flex items-center rounded-lg px-2.5 py-1 ${driver.meta?.isBusy ? "bg-rose-500/10 text-rose-500" : "bg-emerald-500/10 text-emerald-500"}`}>
-                        {driver.meta?.isBusy ? "On-Task" : "Idle"}
-                      </span>
+                      {!driver.isOnline ? (
+                        <span className="inline-flex items-center rounded-lg px-2.5 py-1 bg-slate-500/10 text-slate-400">
+                          Off Duty
+                        </span>
+                      ) : driver.isReturning ? (
+                        <span className="inline-flex items-center rounded-lg px-2.5 py-1 bg-rose-500/10 text-rose-500">
+                          Busy
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-lg px-2.5 py-1 bg-emerald-500/10 text-emerald-500">
+                          Idle
+                        </span>
+                      )}
                     </TableCell>
 
                     <TableCell className="px-6 py-4 text-sm">
@@ -150,11 +160,19 @@ export default function DriverTable() {
                     </TableCell>
 
                     <TableCell className="px-6 py-4 text-center">
-                      <span
-                        className={`inline-flex items-center gap-1 rounded-full px-4 py-1.5 text-[10px] font-black tracking-[0.15em] ring-1 ring-inset ${driver.isOnline && !driver.meta?.isBusy ? "bg-emerald-500/10 text-emerald-500 ring-emerald-500/40" : "bg-slate-500/10 text-slate-500 ring-slate-500/40"}`}
-                      >
-                         {driver.isOnline ? (driver.meta?.isBusy ? "BUSY" : "READY") : "OFF DUTY"}
-                      </span>
+                      {!driver.isOnline ? (
+                        <span className="inline-flex items-center gap-1 rounded-full px-4 py-1.5 text-[10px] font-black tracking-[0.15em] ring-1 ring-inset bg-slate-500/10 text-slate-500 ring-slate-500/40">
+                          OFF DUTY
+                        </span>
+                      ) : driver.isReturning ? (
+                        <span className="inline-flex items-center gap-1 rounded-full px-4 py-1.5 text-[10px] font-black tracking-[0.15em] ring-1 ring-inset bg-amber-500/10 text-amber-600 ring-amber-500/40">
+                          OUT FOR DELIVERY
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full px-4 py-1.5 text-[10px] font-black tracking-[0.15em] ring-1 ring-inset bg-emerald-500/10 text-emerald-500 ring-emerald-500/40">
+                          READY
+                        </span>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))

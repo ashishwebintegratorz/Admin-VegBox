@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { authService, userService, orderService, productService, categoryService } from "../services/api";
+import { authService, userService, orderService, productService, categoryService, driverService } from "../services/api";
 
 // Auth Hooks
 export const useSendOtp = () => {
@@ -34,7 +34,17 @@ export const useProfile = () => {
 export const useDriversList = () => {
     return useQuery({
         queryKey: ["drivers"],
-        queryFn: () => userService.getDrivers().then(res => {
+        queryFn: () => driverService.getAllDrivers().then(res => {
+            const data = res.data.data || res.data;
+            return Array.isArray(data) ? data : (data.drivers || data.users || []);
+        }),
+    });
+};
+
+export const useFreeDriversList = () => {
+    return useQuery({
+        queryKey: ["drivers", "free"],
+        queryFn: () => driverService.getFreeDrivers().then(res => {
             const data = res.data.data || res.data;
             return Array.isArray(data) ? data : (data.drivers || data.users || []);
         }),
