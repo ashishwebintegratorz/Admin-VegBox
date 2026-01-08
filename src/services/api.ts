@@ -6,6 +6,21 @@ const api = axios.create({
     baseURL: API_BASE_URL,
 });
 
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+    failedQueue.forEach((prom) => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
+        }
+    });
+
+    failedQueue = [];
+};
+
 api.interceptors.request.use((config) => {
     const userStr = localStorage.getItem("user");
     if (userStr) {
@@ -20,6 +35,68 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+api.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+        const originalRequest = error.config;
+
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            if (isRefreshing) {
+                return new Promise((resolve, reject) => {
+                    failedQueue.push({ resolve, reject });
+                })
+                    .then((token) => {
+                        originalRequest.headers.Authorization = `Bearer ${token}`;
+                        return api(originalRequest);
+                    })
+                    .catch((err) => {
+                        return Promise.reject(err);
+                    });
+            }
+
+            originalRequest._retry = true;
+            isRefreshing = true;
+
+            try {
+                const userStr = localStorage.getItem("user");
+                if (!userStr) throw new Error("No user stored");
+
+                const userData = JSON.parse(userStr);
+                const refreshToken = userData?.data?.refreshToken || userData?.refreshToken;
+
+                if (!refreshToken) throw new Error("No refresh token available");
+
+                const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
+                    refreshToken,
+                });
+
+                const { token: newAccessToken } = response.data;
+
+                // Update stored user data with new access token
+                if (userData.data) {
+                    userData.data.accessToken = newAccessToken;
+                } else {
+                    userData.token = newAccessToken;
+                }
+                localStorage.setItem("user", JSON.stringify(userData));
+
+                processQueue(null, newAccessToken);
+
+                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                return api(originalRequest);
+            } catch (refreshError) {
+                processQueue(refreshError, null);
+                authService.logout();
+                return Promise.reject(refreshError);
+            } finally {
+                isRefreshing = false;
+            }
+        }
+
+        return Promise.reject(error);
+    }
+);
+
 export const authService = {
     sendOtp: (phone: string, role?: string) =>
         api.post("/auth/send-otp", { phone, role }),
@@ -29,6 +106,14 @@ export const authService = {
 
     loginWithPin: (phone: string, pin: string) =>
         api.post("/auth/login-with-pin", { phone, pin }),
+
+    refreshToken: (refreshToken: string) =>
+        api.post("/auth/refresh", { refreshToken }),
+
+    logout: () => {
+        localStorage.removeItem("user");
+        window.location.href = "/signin";
+    }
 };
 
 export const userService = {

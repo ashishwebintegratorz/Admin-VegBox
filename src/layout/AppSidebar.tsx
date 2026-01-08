@@ -45,6 +45,12 @@ const navItems: NavItem[] = [
     path: "/products",
     allowedRoles: ["admin"],
   },
+  {
+    icon: <TableIcon />,
+    name: "Invoices",
+    path: "/invoice",
+    allowedRoles: ["admin"],
+  },
 ];
 
 const othersItems: NavItem[] = [

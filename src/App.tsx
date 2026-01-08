@@ -8,6 +8,8 @@ import Home from "./pages/Dashboard/Home";
 import Orders from "./pages/OrderPage";
 import Drivers from "./pages/DriverPage";
 import Products from "./pages/ProductPage";
+import InvoicePage from "./pages/Invoice/InvoicePage";
+import InvoiceDetail from "./pages/Invoice/InvoiceDetail";
 import ProtectedRoute from "./components/protected/ProtectedRoute";
 
 export default function App() {
@@ -42,6 +44,22 @@ export default function App() {
               element={
                 <ProtectedRoute allowedRoles={["admin"]}>
                   <Products />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/invoice"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <InvoicePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/invoice/:id"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <InvoiceDetail />
                 </ProtectedRoute>
               }
             />
