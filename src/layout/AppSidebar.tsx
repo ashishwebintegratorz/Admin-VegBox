@@ -10,7 +10,6 @@ import {
   UserCircleIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
-import SidebarWidget from "./SidebarWidget";
 
 type NavItem = {
   name: string;
@@ -34,10 +33,19 @@ const navItems: NavItem[] = [
     allowedRoles: ["admin"],
   },
   {
+    icon: <TableIcon />,
+    name: "Reports",
+    path: "/reports",
+    allowedRoles: ["admin"],
+  },
+  {
     icon: <GroupIcon />,
     name: "Drivers",
-    path: "/drivers",
     allowedRoles: ["admin"],
+    subItems: [
+      { name: "Fleet Management", path: "/drivers" },
+      { name: "Assign Orders", path: "/drivers/assign" }
+    ]
   },
   {
     icon: <GridIcon />,
@@ -49,6 +57,18 @@ const navItems: NavItem[] = [
     icon: <TableIcon />,
     name: "Invoices",
     path: "/invoice",
+    allowedRoles: ["admin"],
+  },
+  {
+    icon: <UserCircleIcon />,
+    name: "Users",
+    path: "/users",
+    allowedRoles: ["admin"],
+  },
+  {
+    icon: <GridIcon />,
+    name: "Order Zone",
+    path: "/zones",
     allowedRoles: ["admin"],
   },
 ];
@@ -316,7 +336,6 @@ const AppSidebar: React.FC = () => {
             </div>
           </div>
         </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
       </div>
     </aside>
   );

@@ -10,6 +10,7 @@ import { Pagination } from "../ui/pagination/Pagination";
 import Avatar from "../ui/avatar/Avatar";
 import ModalWrapper from "../../layout/ModalWrapper.tsx";
 import { useOrders, useFreeDriversList, useAssignDriver, useUpdateOrderStatus } from "../../hooks/useApiHooks";
+import { useNavigate } from "react-router";
 
 type OrderRow = {
   _id: string;
@@ -27,6 +28,7 @@ type OrderRow = {
 };
 
 export default function OrderTable() {
+  const navigate = useNavigate();
   const { data: apiOrders, isLoading: isLoadingOrders } = useOrders();
   const { data: drivers } = useFreeDriversList();
   
@@ -37,7 +39,6 @@ export default function OrderTable() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState<OrderRow | null>(null);
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
-  
   const [newDriverId, setNewDriverId] = useState("");
   const [newOrderStatus, setNewOrderStatus] = useState("");
   const [newDeliveryStatus, setNewDeliveryStatus] = useState("");
@@ -85,6 +86,7 @@ export default function OrderTable() {
     setIsManageModalOpen(true);
   };
 
+
   const handleSaveChanges = async () => {
     if (!selectedOrder) return;
 
@@ -118,6 +120,7 @@ export default function OrderTable() {
       alert(errorMessage);
     }
   };
+
 
   if (isLoadingOrders) {
     return (
@@ -240,12 +243,20 @@ export default function OrderTable() {
                     </TableCell>
 
                     <TableCell className="px-5 py-4 text-center">
-                      <button
-                        onClick={() => handleOpenManage(order)}
-                        className="inline-flex items-center gap-1 rounded-lg border border-blue-500/40 bg-blue-600 px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-white shadow-lg shadow-blue-500/20 transition hover:-translate-y-[1px] hover:bg-blue-500 hover:shadow-blue-500/40 active:scale-95"
-                      >
-                        Manage
-                      </button>
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); navigate(`/orders/${order._id}`); }}
+                          className="inline-flex items-center gap-1 rounded-lg border border-indigo-500/40 bg-indigo-600 px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-white shadow-lg shadow-indigo-500/20 transition hover:-translate-y-[1px] hover:bg-indigo-500 hover:shadow-indigo-500/40 active:scale-95"
+                        >
+                          Assign / View
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleOpenManage(order); }}
+                          className="inline-flex items-center gap-1 rounded-lg border border-slate-500/40 bg-slate-600 px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-white shadow-lg shadow-slate-500/20 transition hover:-translate-y-[1px] hover:bg-slate-500 hover:shadow-slate-500/40 active:scale-95"
+                        >
+                          Manage Status
+                        </button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -373,6 +384,8 @@ export default function OrderTable() {
             </div>
            </div>
         </ModalWrapper>
+
+
       </div>
     </div>
   );

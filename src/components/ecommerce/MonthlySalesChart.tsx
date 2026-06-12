@@ -4,8 +4,11 @@ import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { MoreDotIcon } from "../../icons";
 import { useState } from "react";
+import { useDashboardMetrics } from "../../hooks/useApiHooks";
 
 export default function MonthlySalesChart() {
+  const { data: metrics, isLoading } = useDashboardMetrics();
+
   const options: ApexOptions = {
     colors: ["#465fff"],
     chart: {
@@ -81,14 +84,14 @@ export default function MonthlySalesChart() {
         show: false,
       },
       y: {
-        formatter: (val: number) => `${val}`,
+        formatter: (val: number) => `₹${val}`,
       },
     },
   };
   const series = [
     {
       name: "Sales",
-      data: [168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112],
+      data: isLoading ? Array(12).fill(0) : (metrics?.monthlySales || Array(12).fill(0)),
     },
   ];
   const [isOpen, setIsOpen] = useState(false);

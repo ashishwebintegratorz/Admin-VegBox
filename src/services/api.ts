@@ -138,6 +138,9 @@ export const orderService = {
     listAllOrders: (status?: string, deliveryStatus?: string) =>
         api.get("/orders/all", { params: { status, deliveryStatus } }),
 
+    getOrder: (orderId: string) =>
+        api.get(`/orders/${orderId}`),
+
     assignDriver: (orderId: string, driverId: string) =>
         api.put(`/orders/assign-driver/${orderId}`, { driverId }),
 
@@ -159,6 +162,27 @@ export const productService = {
 
 export const categoryService = {
     listCategories: () => api.get("/categories"),
+};
+
+export const adminService = {
+    getDashboardMetrics: () => api.get("/admin/dashboard").then(res => res.data),
+};
+
+export const zoneService = {
+    getZones: () => api.get("/zones"),
+    createZone: (data: any) => api.post("/zones", data),
+    updateZone: (id: string, data: any) => api.put(`/zones/${id}`, data),
+    deleteZone: (id: string) => api.delete(`/zones/${id}`),
+};
+
+export const settingService = {
+    getSettings: () => api.get("/settings"),
+    updateSetting: (key: string, value: any) => api.put(`/settings/${key}`, { value }),
+};
+
+export const adminUserService = {
+    getAllUsers: () => api.get("/user/all"),
+    blockUser: (id: string) => api.put(`/user/block/${id}`),
 };
 
 export default api;

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { authService, userService, orderService, productService, categoryService, driverService } from "../services/api";
+import { authService, userService, orderService, productService, categoryService, driverService, adminService, zoneService, settingService, adminUserService } from "../services/api";
 
 // Auth Hooks
 export const useSendOtp = () => {
@@ -35,7 +35,8 @@ export const useDriversList = () => {
     return useQuery({
         queryKey: ["drivers"],
         queryFn: () => driverService.getAllDrivers().then(res => {
-            const data = res.data.data || res.data;
+            const data = res?.data?.data || res?.data;
+            if (!data) return [];
             return Array.isArray(data) ? data : (data.drivers || data.users || []);
         }),
     });
@@ -62,6 +63,14 @@ export const useOrders = (status?: string, deliveryStatus?: string) => {
     });
 };
 
+export const useOrder = (orderId: string) => {
+    return useQuery({
+        queryKey: ["order", orderId],
+        queryFn: () => orderService.getOrder(orderId).then(res => res.data.data || res.data),
+        enabled: !!orderId,
+    });
+};
+
 export const useAssignDriver = () => {
     const queryClient = useQueryClient();
     return useMutation({
@@ -80,6 +89,7 @@ export const useUpdateOrderStatus = () => {
             orderService.updateOrderStatus(orderId, status, deliveryStatus),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["orders"] });
+            queryClient.invalidateQueries({ queryKey: ["order"] });
         },
     });
 };
@@ -129,5 +139,89 @@ export const useCategories = () => {
             const data = res.data.data || res.data;
             return Array.isArray(data) ? data : (data.categories || []);
         }),
+    });
+};
+
+export const useDashboardMetrics = () => {
+    return useQuery({
+        queryKey: ["dashboardMetrics"],
+        queryFn: () => adminService.getDashboardMetrics().then(res => res.data || res),
+    });
+};
+
+// Zone Hooks
+export const useZones = () => {
+    return useQuery({
+        queryKey: ["zones"],
+        queryFn: () => zoneService.getZones().then(res => {
+            const data = res.data.data || res.data;
+            return Array.isArray(data) ? data : [];
+        }),
+    });
+};
+
+export const useCreateZone = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: any) => zoneService.createZone(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["zones"] });
+        },
+    });
+};
+
+export const useUpdateZone = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, data }: { id: string; data: any }) => zoneService.updateZone(id, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["zones"] });
+        },
+    });
+};
+
+export const useDeleteZone = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: string) => zoneService.deleteZone(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["zones"] });
+        },
+    });
+};
+
+// Admin User Hooks
+export const useAdminUsers = () => {
+    return useQuery({
+        queryKey: ["adminUsers"],
+        queryFn: () => adminUserService.getAllUsers().then(res => res.data),
+    });
+};
+
+export const useBlockUser = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: string) => adminUserService.blockUser(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["adminUsers"] });
+        },
+    });
+};
+
+// Settings Hooks
+export const useSettings = () => {
+    return useQuery({
+        queryKey: ["settings"],
+        queryFn: () => settingService.getSettings().then(res => res.data.settings),
+    });
+};
+
+export const useUpdateSetting = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ key, value }: { key: string; value: any }) => settingService.updateSetting(key, value),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["settings"] });
+        },
     });
 };
