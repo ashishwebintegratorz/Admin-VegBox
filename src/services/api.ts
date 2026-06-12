@@ -126,6 +126,7 @@ export const driverService = {
     toggleOnline: (isOnline: boolean) =>
         api.put("/drivers/toggle-online", { isOnline }),
     reachedStore: () => api.put("/drivers/reached-store"),
+    onboardDriver: (formData: FormData) => api.post("/drivers/onboard", formData),
 };
 
 export const orderService = {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
+import { driverService } from "../../services/api";
 
 interface OnboardDriverModalProps {
   isOpen: boolean;
@@ -54,21 +55,12 @@ export default function OnboardDriverModal({ isOpen, onClose, onSuccess }: Onboa
       formData.append("pin", pin);
       formData.append("drivingLicense", drivingLicense);
 
-      // We need the token for the request
-      const token = localStorage.getItem("access_token");
 
-      const response = await fetch("http://localhost:5000/api/v1/drivers/onboard", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      // We use the pre-configured axios instance so it automatically attaches the correct Authorization header.
+      const response = await driverService.onboardDriver(formData);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to onboard driver");
+      if (response.status !== 200 && response.status !== 201) {
+        throw new Error(response.data?.message || "Failed to onboard driver");
       }
 
       onSuccess();

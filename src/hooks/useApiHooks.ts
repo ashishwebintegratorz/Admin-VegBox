@@ -60,6 +60,7 @@ export const useOrders = (status?: string, deliveryStatus?: string) => {
             const data = res.data.data || res.data;
             return Array.isArray(data) ? data : (data.orders || []);
         }),
+        refetchInterval: 5000,
     });
 };
 

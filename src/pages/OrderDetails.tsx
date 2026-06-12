@@ -246,6 +246,14 @@ export default function OrderDetails() {
                     }`}
                   >
                     <div className="flex items-center gap-4">
+                      <input
+                        type="radio"
+                        name="driverSelection"
+                        value={driver._id}
+                        checked={selectedDriverId === driver._id}
+                        onChange={() => setSelectedDriverId(driver._id)}
+                        className="sr-only"
+                      />
                       <div className={`flex items-center justify-center w-5 h-5 rounded-full border-2 ${
                         selectedDriverId === driver._id
                           ? "border-blue-500"
