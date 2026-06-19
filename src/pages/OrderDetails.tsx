@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useOrder, useDriversList, useAssignDriver, useUpdateOrderStatus } from "../hooks/useApiHooks";
 import Avatar from "../components/ui/avatar/Avatar";

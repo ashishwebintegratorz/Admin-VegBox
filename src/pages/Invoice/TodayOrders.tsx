@@ -1,16 +1,13 @@
-import React, { useRef, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useOrders } from "../../hooks/useApiHooks";
 import PageMeta from "../../components/common/PageMeta";
-import Button from "../../components/ui/button/Button";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "../../components/ui/table";
-import Badge from "../../components/ui/badge/Badge";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { OrdersReportPdf } from "../../layout/OrdersReportPdf";
 
 export default function TodayOrders() {
-  const { data: allOrders, isLoading, error } = useOrders();
-  const invoiceRef = useRef<HTMLDivElement>(null);
+  const { data: allOrders, isLoading } = useOrders();
   const navigate = useNavigate();
   
   // Filter state

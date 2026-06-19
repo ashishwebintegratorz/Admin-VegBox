@@ -4,14 +4,12 @@ interface PaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-  windowSize?: number;
 }
 
 export const Pagination: React.FC<PaginationProps> = ({
   currentPage,
   totalPages,
   onPageChange,
-  windowSize = 3,
 }) => {
   const pages = [];
   for (let i = 1; i <= totalPages; i++) {

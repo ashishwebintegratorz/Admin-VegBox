@@ -99,7 +99,7 @@ export default function SignInForm() {
                     onClick={() => setShowPin(!showPin)}
                     className="absolute inset-y-0 right-4 flex items-center cursor-pointer text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                   >
-                    {showPin ? <EyeIcon size={20} /> : <EyeCloseIcon size={20} />}
+                    {showPin ? <EyeIcon width={20} height={20} /> : <EyeCloseIcon width={20} height={20} />}
                   </span>
                 </div>
               </div>

@@ -1,6 +1,6 @@
-import React, { useState, useRef } from "react";
+import { useState } from "react";
 import { useZones, useCreateZone, useDeleteZone } from "../hooks/useApiHooks";
-import { MapContainer, TileLayer, Polygon, Popup, useMap, GeoJSON } from "react-leaflet";
+import { MapContainer, TileLayer, Popup, useMap, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import Button from "../components/ui/button/Button";
 import L from "leaflet";
