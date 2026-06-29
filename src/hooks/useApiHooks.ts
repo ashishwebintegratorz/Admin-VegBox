@@ -95,6 +95,18 @@ export const useUpdateOrderStatus = () => {
     });
 };
 
+export const useRescheduleOrder = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ orderId, timeSlot, scheduleDate }: { orderId: string; timeSlot: string; scheduleDate: string }) =>
+            orderService.rescheduleOrder(orderId, timeSlot, scheduleDate),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["orders"] });
+            queryClient.invalidateQueries({ queryKey: ["order"] });
+        },
+    });
+};
+
 // Product Hooks
 export const useProducts = (params?: { page?: number; limit?: number; search?: string; category?: string; sort?: string; minPrice?: number; maxPrice?: number }) => {
     return useQuery({

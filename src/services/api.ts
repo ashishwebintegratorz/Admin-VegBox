@@ -147,6 +147,9 @@ export const orderService = {
 
     updateOrderStatus: (orderId: string, status?: string, deliveryStatus?: string) =>
         api.put(`/orders/update-status/${orderId}`, { status, deliveryStatus }),
+
+    rescheduleOrder: (orderId: string, timeSlot: string, scheduleDate: string) =>
+        api.put(`/orders/reschedule/${orderId}`, { timeSlot, scheduleDate }),
 };
 
 export const productService = {

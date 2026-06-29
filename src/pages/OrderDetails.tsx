@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
-import { useOrder, useDriversList, useAssignDriver, useUpdateOrderStatus } from "../hooks/useApiHooks";
+import { useOrder, useDriversList, useAssignDriver, useUpdateOrderStatus, useRescheduleOrder } from "../hooks/useApiHooks";
+import { Modal } from "../components/ui/modal";
 import Avatar from "../components/ui/avatar/Avatar";
 import Button from "../components/ui/button/Button";
 import { PDFDownloadLink } from "@react-pdf/renderer";
@@ -13,6 +14,23 @@ export default function OrderDetails() {
   const { data: drivers, isLoading: isDriversLoading } = useDriversList();
   const assignDriverMutation = useAssignDriver();
   const updateStatusMutation = useUpdateOrderStatus();
+  const rescheduleMutation = useRescheduleOrder();
+
+  const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState("Afternoon (12:00 PM - 04:00 PM)");
+  const [selectedDate, setSelectedDate] = useState("Today");
+
+  const handleReschedule = async () => {
+    if (!id || !selectedSlot || !selectedDate) return;
+    try {
+      await rescheduleMutation.mutateAsync({ orderId: id, timeSlot: selectedSlot, scheduleDate: selectedDate });
+      setIsRescheduleModalOpen(false);
+      alert("Order rescheduled successfully!");
+    } catch (error: any) {
+      alert(error?.response?.data?.message || "Failed to reschedule order.");
+    }
+  };
+
   const mapOrderToInvoice = (ord: any) => {
     if (!ord) return {};
     return {
@@ -124,6 +142,13 @@ export default function OrderDetails() {
         </div>
         <div className="flex flex-col items-end gap-2">
           <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={() => { 
+              setSelectedSlot(order?.timeSlot || "Morning (08:00 AM - 12:00 PM)"); 
+              setSelectedDate(order?.scheduleDate || "Today");
+              setIsRescheduleModalOpen(true); 
+            }}>
+              Reschedule Order
+            </Button>
             {order && (
               <PDFDownloadLink
                 document={<InvoicePdf invoice={mapOrderToInvoice(order)} user={order.customer} />}
@@ -326,6 +351,62 @@ export default function OrderDetails() {
           </PDFDownloadLink>
         )}
       </div>
+
+      <Modal isOpen={isRescheduleModalOpen} onClose={() => setIsRescheduleModalOpen(false)} className="max-w-md p-6">
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Reschedule Order</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Select a new date and delivery shift for this order.</p>
+        
+        <div className="space-y-4 mb-6">
+          <div>
+            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-2">Select Date</h3>
+            <div className="grid grid-cols-2 gap-3">
+              {["Today", "Tomorrow"].map((date) => (
+                <label key={date} className={`flex items-center justify-center py-2 px-3 rounded-xl border cursor-pointer transition-all ${selectedDate === date ? "border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 font-bold" : "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"}`}>
+                  <input
+                    type="radio"
+                    name="scheduleDate"
+                    value={date}
+                    checked={selectedDate === date}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="sr-only"
+                  />
+                  {date}
+                </label>
+              ))}
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-2">Select Time Slot</h3>
+            <div className="space-y-2">
+              {[
+                "Morning (08:00 AM - 12:00 PM)",
+                "Afternoon (12:00 PM - 04:00 PM)",
+                "Evening (04:00 PM - 09:00 PM)"
+              ].map((slot) => (
+                <label key={slot} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${selectedSlot === slot ? "border-blue-500 bg-blue-50 dark:bg-blue-500/10" : "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"}`}>
+                  <input
+                    type="radio"
+                    name="timeSlot"
+                    value={slot}
+                    checked={selectedSlot === slot}
+                    onChange={(e) => setSelectedSlot(e.target.value)}
+                    className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{slot}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3">
+          <Button variant="outline" onClick={() => setIsRescheduleModalOpen(false)}>Cancel</Button>
+          <Button onClick={handleReschedule} disabled={rescheduleMutation.isPending}>
+            {rescheduleMutation.isPending ? "Rescheduling..." : "Continue"}
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }

@@ -35,7 +35,7 @@ export default function DriverDetails() {
   const fetchDriver = async () => {
     try {
       const token = getToken();
-      const res = await fetch(`http://localhost:5000/api/v1/drivers/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_BASIC_API_URL}/drivers/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -65,7 +65,7 @@ export default function DriverDetails() {
     e.preventDefault();
     try {
       const token = getToken();
-      const res = await fetch(`http://localhost:5000/api/v1/drivers/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_BASIC_API_URL}/drivers/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -88,7 +88,7 @@ export default function DriverDetails() {
   const handleDelete = async () => {
     try {
       const token = getToken();
-      const res = await fetch(`http://localhost:5000/api/v1/drivers/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_BASIC_API_URL}/drivers/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
