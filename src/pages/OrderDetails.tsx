@@ -241,6 +241,12 @@ export default function OrderDetails() {
                   </div>
                 </div>
               )})}
+              {order.discountAmount > 0 && (
+                <div className="border-t border-slate-200 dark:border-slate-700 pt-3 flex justify-between font-medium text-sm text-green-600 dark:text-green-400">
+                  <span>Discount ({order.couponCode})</span>
+                  <span>-₹{order.discountAmount}</span>
+                </div>
+              )}
               <div className="border-t border-slate-200 dark:border-slate-700 pt-3 flex justify-between font-bold text-lg text-slate-900 dark:text-white">
                 <span>Total</span>
                 <span>₹{order.payableAmount}</span>

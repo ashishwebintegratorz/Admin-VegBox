@@ -238,3 +238,77 @@ export const useUpdateSetting = () => {
         },
     });
 };
+
+// Notifications & Coupons Hooks
+export const useUsersList = (type?: string) => {
+    return useQuery({
+        queryKey: ["usersList", type],
+        queryFn: () => adminService.getUsersList(type),
+    });
+};
+
+export const useBroadcastNotification = () => {
+    return useMutation({
+        mutationFn: (data: FormData) => adminService.broadcastNotification(data),
+    });
+};
+
+export const useBroadcastCoupon = () => {
+    return useMutation({
+        mutationFn: (data: FormData) => adminService.broadcastCoupon(data),
+    });
+};
+
+export const useCoupons = () => {
+    return useQuery({
+        queryKey: ["coupons"],
+        queryFn: () => adminService.getCoupons(),
+    });
+};
+
+export const useUpdateCoupon = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, data }: { id: string; data: FormData }) => adminService.updateCoupon(id, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["coupons"] });
+        },
+    });
+};
+
+export const useDeleteCoupon = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: string) => adminService.deleteCoupon(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["coupons"] });
+        },
+    });
+};
+
+export const useNotifications = () => {
+    return useQuery({
+        queryKey: ["notifications"],
+        queryFn: () => adminService.getNotifications(),
+    });
+};
+
+export const useUpdateNotification = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, data }: { id: string; data: FormData }) => adminService.updateNotification(id, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["notifications"] });
+        },
+    });
+};
+
+export const useDeleteNotification = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: string) => adminService.deleteNotification(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["notifications"] });
+        },
+    });
+};

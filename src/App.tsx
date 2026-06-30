@@ -17,6 +17,7 @@ import AssignOrders from "./pages/AssignOrders";
 import TodayOrders from "./pages/Invoice/TodayOrders";
 import OrderZone from "./pages/OrderZone";
 import Users from "./pages/Users";
+import NotificationsCoupons from "./pages/NotificationsCoupons";
 
 export default function App() {
   return (
@@ -33,6 +34,15 @@ export default function App() {
               element={
                 <ProtectedRoute allowedRoles={["admin"]}>
                   <Users />
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/notifications"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <NotificationsCoupons />
                 </ProtectedRoute>
               }
             />

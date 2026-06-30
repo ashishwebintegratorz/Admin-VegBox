@@ -170,6 +170,15 @@ export const categoryService = {
 
 export const adminService = {
     getDashboardMetrics: () => api.get("/admin/dashboard").then(res => res.data),
+    getUsersList: (type?: string) => api.get(`/admin/users-list${type ? `?type=${type}` : ''}`).then(res => res.data),
+    broadcastNotification: (data: FormData) => api.post("/admin/broadcast-notification", data, { headers: { 'Content-Type': 'multipart/form-data' } }).then(res => res.data),
+    broadcastCoupon: (data: FormData) => api.post("/admin/broadcast-coupon", data, { headers: { 'Content-Type': 'multipart/form-data' } }).then(res => res.data),
+    getCoupons: () => api.get("/admin/coupons").then(res => res.data),
+    updateCoupon: (id: string, data: FormData) => api.put(`/admin/coupons/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } }).then(res => res.data),
+    deleteCoupon: (id: string) => api.delete(`/admin/coupons/${id}`).then(res => res.data),
+    getNotifications: () => api.get("/admin/notifications").then(res => res.data),
+    updateNotification: (id: string, data: FormData) => api.put(`/admin/notifications/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } }).then(res => res.data),
+    deleteNotification: (id: string) => api.delete(`/admin/notifications/${id}`).then(res => res.data),
 };
 
 export const zoneService = {

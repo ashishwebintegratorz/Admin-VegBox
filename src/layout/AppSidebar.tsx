@@ -67,6 +67,12 @@ const navItems: NavItem[] = [
   },
   {
     icon: <GridIcon />,
+    name: "Notifications & Coupons",
+    path: "/notifications",
+    allowedRoles: ["admin"],
+  },
+  {
+    icon: <GridIcon />,
     name: "Order Zone",
     path: "/zones",
     allowedRoles: ["admin"],
