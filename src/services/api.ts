@@ -174,10 +174,16 @@ export const adminService = {
     broadcastNotification: (data: FormData) => api.post("/admin/broadcast-notification", data, { headers: { 'Content-Type': 'multipart/form-data' } }).then(res => res.data),
     broadcastCoupon: (data: FormData) => api.post("/admin/broadcast-coupon", data, { headers: { 'Content-Type': 'multipart/form-data' } }).then(res => res.data),
     getCoupons: () => api.get("/admin/coupons").then(res => res.data),
-    updateCoupon: (id: string, data: FormData) => api.put(`/admin/coupons/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } }).then(res => res.data),
+    updateCoupon: (id: string, data: FormData | any) => {
+        const isFormData = typeof FormData !== "undefined" && data instanceof FormData;
+        return api.put(`/admin/coupons/${id}`, data, isFormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : undefined).then(res => res.data);
+    },
     deleteCoupon: (id: string) => api.delete(`/admin/coupons/${id}`).then(res => res.data),
     getNotifications: () => api.get("/admin/notifications").then(res => res.data),
-    updateNotification: (id: string, data: FormData) => api.put(`/admin/notifications/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } }).then(res => res.data),
+    updateNotification: (id: string, data: FormData | any) => {
+        const isFormData = typeof FormData !== "undefined" && data instanceof FormData;
+        return api.put(`/admin/notifications/${id}`, data, isFormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : undefined).then(res => res.data);
+    },
     deleteNotification: (id: string) => api.delete(`/admin/notifications/${id}`).then(res => res.data),
 };
 

@@ -9,7 +9,6 @@ export default function NotificationsCoupons() {
   
   // Coupon Management State
   const [editingCoupon, setEditingCoupon] = useState<any>(null);
-  const [editDiscountValue, setEditDiscountValue] = useState<number>(0);
 
   // Notification Management State
   const [editingNotif, setEditingNotif] = useState<any>(null);
@@ -305,16 +304,7 @@ export default function NotificationsCoupons() {
                             )}
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                            {editingCoupon?._id === coupon._id ? (
-                              <input 
-                                type="number" 
-                                className="w-20 rounded border border-gray-300 px-2 py-1 outline-none text-black" 
-                                value={editDiscountValue} 
-                                onChange={(e) => setEditDiscountValue(Number(e.target.value))}
-                              />
-                            ) : (
-                              `${coupon.discountValue} ${coupon.discountType === 'percent' ? '%' : 'Fixed'}`
-                            )}
+                            {`${coupon.discountValue} ${coupon.discountType === 'percent' ? '%' : 'Fixed'}`}
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                             {coupon.usedBy?.length || 0} times

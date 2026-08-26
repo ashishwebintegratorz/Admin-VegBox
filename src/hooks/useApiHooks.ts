@@ -269,7 +269,7 @@ export const useCoupons = () => {
 export const useUpdateCoupon = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({ id, data }: { id: string; data: FormData }) => adminService.updateCoupon(id, data),
+        mutationFn: ({ id, data }: { id: string; data: FormData | any }) => adminService.updateCoupon(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["coupons"] });
         },
@@ -296,7 +296,7 @@ export const useNotifications = () => {
 export const useUpdateNotification = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({ id, data }: { id: string; data: FormData }) => adminService.updateNotification(id, data),
+        mutationFn: ({ id, data }: { id: string; data: FormData | any }) => adminService.updateNotification(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["notifications"] });
         },
