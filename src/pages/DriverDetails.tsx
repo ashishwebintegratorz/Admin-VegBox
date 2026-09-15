@@ -11,6 +11,7 @@ export default function DriverDetails() {
   const navigate = useNavigate();
   const [driver, setDriver] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
+  const [codInfo, setCodInfo] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -39,9 +40,18 @@ export default function DriverDetails() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
+      
+      const codRes = await fetch(`${import.meta.env.VITE_BASIC_API_URL}/drivers/${id}/cod-estimate`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const codData = await codRes.json();
+      
       if (res.ok) {
         setDriver(data.driver);
         setStats(data.stats);
+        if (codRes.ok) {
+          setCodInfo(codData);
+        }
         setEditName(data.driver.name);
         setEditPhone(data.driver.phone);
         setEditUpiId(data.driver.driverDetails?.upiId || "");
@@ -95,6 +105,26 @@ export default function DriverDetails() {
       if (res.ok) {
         setIsDeleteModalOpen(false);
         navigate("/drivers");
+      } else {
+        const err = await res.json();
+        alert(err.message);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleSettleCOD = async () => {
+    if (!window.confirm("Are you sure you want to settle the COD amount? This means you have received the cash from the driver.")) return;
+    try {
+      const token = getToken();
+      const res = await fetch(`${import.meta.env.VITE_BASIC_API_URL}/drivers/${id}/settle-cod`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        alert("COD Settled Successfully!");
+        fetchDriver();
       } else {
         const err = await res.json();
         alert(err.message);
@@ -230,6 +260,44 @@ export default function DriverDetails() {
             </div>
           </div>
         </div>
+
+        {/* COD Settlement Section */}
+        {codInfo && codInfo.pendingOrderCount > 0 && (
+          <div className="rounded-2xl border border-orange-200 bg-orange-50 p-6 shadow-sm dark:border-orange-900/30 dark:bg-orange-900/10">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-orange-800 dark:text-orange-500">
+                COD Settlement Due
+              </h2>
+              <span className="inline-flex items-center rounded-full bg-orange-200 px-3 py-1 text-xs font-bold text-orange-900">
+                {codInfo.pendingOrderCount} Orders
+              </span>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="rounded-xl bg-white p-4 shadow-sm border border-orange-100 dark:bg-gray-800 dark:border-gray-700">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total COD Collected</p>
+                <p className="mt-1 text-xl font-bold text-gray-900 dark:text-white">₹{codInfo.totalCODCollected}</p>
+              </div>
+              <div className="rounded-xl bg-white p-4 shadow-sm border border-orange-100 dark:bg-gray-800 dark:border-gray-700">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Driver Earnings (Deducted)</p>
+                <p className="mt-1 text-xl font-bold text-red-600">- ₹{codInfo.driverEarnings}</p>
+              </div>
+              <div className="rounded-xl bg-orange-100 p-4 shadow-sm border border-orange-200 dark:bg-orange-900/20 dark:border-orange-800">
+                <p className="text-sm font-bold text-orange-900 dark:text-orange-400">Net Payable to Admin</p>
+                <p className="mt-1 text-2xl font-black text-orange-600">₹{codInfo.netAmountToAdmin}</p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <Button
+                className="bg-orange-500 hover:bg-orange-600 text-white"
+                onClick={handleSettleCOD}
+              >
+                Mark as Settled
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Delete Confirmation Modal */}

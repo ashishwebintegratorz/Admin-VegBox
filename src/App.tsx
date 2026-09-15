@@ -18,6 +18,9 @@ import TodayOrders from "./pages/Invoice/TodayOrders";
 import OrderZone from "./pages/OrderZone";
 import Users from "./pages/Users";
 import NotificationsCoupons from "./pages/NotificationsCoupons";
+import CategoryManagement from "./pages/CategoryManagement";
+import BannerManagement from "./pages/BannerManagement";
+import CODManagement from "./pages/CODManagement";
 
 export default function App() {
   return (
@@ -98,10 +101,34 @@ export default function App() {
               }
             />
             <Route
+              path="/cod-management"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <CODManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/products"
               element={
                 <ProtectedRoute allowedRoles={["admin"]}>
                   <Products />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/categories"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <CategoryManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/banners"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <BannerManagement />
                 </ProtectedRoute>
               }
             />

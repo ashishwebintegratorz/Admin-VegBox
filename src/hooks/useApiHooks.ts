@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { authService, userService, orderService, productService, categoryService, driverService, adminService, zoneService, settingService, adminUserService } from "../services/api";
+import { authService, userService, orderService, productService, categoryService, driverService, adminService, zoneService, settingService, adminUserService, bannerService } from "../services/api";
 
 // Auth Hooks
 export const useSendOtp = () => {
@@ -152,6 +152,65 @@ export const useCategories = () => {
             const data = res.data.data || res.data;
             return Array.isArray(data) ? data : (data.categories || []);
         }),
+    });
+};
+
+export const useCreateCategory = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: any) => categoryService.createCategory(data),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["categories"] }),
+    });
+};
+
+export const useUpdateCategory = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, data }: { id: string; data: any }) => categoryService.updateCategory(id, data),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["categories"] }),
+    });
+};
+
+export const useDeleteCategory = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: string) => categoryService.deleteCategory(id),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["categories"] }),
+    });
+};
+
+// Banner Hooks
+export const useBanners = () => {
+    return useQuery({
+        queryKey: ["banners"],
+        queryFn: () => bannerService.getBanners().then((res: any) => {
+            const data = res.data.data || res.data;
+            return Array.isArray(data) ? data : (data.banners || []);
+        }),
+    });
+};
+
+export const useCreateBanner = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: any) => bannerService.createBanner(data),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["banners"] }),
+    });
+};
+
+export const useUpdateBanner = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, data }: { id: string; data: any }) => bannerService.updateBanner(id, data),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["banners"] }),
+    });
+};
+
+export const useDeleteBanner = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: string) => bannerService.deleteBanner(id),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["banners"] }),
     });
 };
 

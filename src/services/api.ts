@@ -166,6 +166,24 @@ export const productService = {
 
 export const categoryService = {
     listCategories: () => api.get("/categories"),
+    createCategory: (data: FormData) => api.post("/categories/add", data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+    updateCategory: (id: string, data: FormData) => api.put(`/categories/${id}`, data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+    deleteCategory: (id: string) => api.delete(`/categories/${id}`),
+};
+
+export const bannerService = {
+    getBanners: () => api.get("/banners"),
+    createBanner: (data: FormData) => api.post("/banners", data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+    updateBanner: (id: string, data: FormData) => api.put(`/banners/${id}`, data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+    deleteBanner: (id: string) => api.delete(`/banners/${id}`),
 };
 
 export const adminService = {

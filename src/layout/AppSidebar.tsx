@@ -8,6 +8,13 @@ import {
   HorizontaLDots,
   TableIcon,
   UserCircleIcon,
+  PieChartIcon,
+  BoxCubeIcon,
+  FolderIcon,
+  PageIcon,
+  DocsIcon,
+  ChatIcon,
+  PlugInIcon
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 
@@ -33,7 +40,7 @@ const navItems: NavItem[] = [
     allowedRoles: ["admin"],
   },
   {
-    icon: <TableIcon />,
+    icon: <PieChartIcon />,
     name: "Reports",
     path: "/reports",
     allowedRoles: ["admin"],
@@ -44,17 +51,30 @@ const navItems: NavItem[] = [
     allowedRoles: ["admin"],
     subItems: [
       { name: "Fleet Management", path: "/drivers" },
-      { name: "Assign Orders", path: "/drivers/assign" }
+      { name: "Assign Orders", path: "/drivers/assign" },
+      { name: "COD Management", path: "/cod-management" }
     ]
   },
   {
-    icon: <GridIcon />,
+    icon: <BoxCubeIcon />,
     name: "Products",
     path: "/products",
     allowedRoles: ["admin"],
   },
   {
-    icon: <TableIcon />,
+    icon: <FolderIcon />,
+    name: "Categories",
+    path: "/categories",
+    allowedRoles: ["admin"],
+  },
+  {
+    icon: <PageIcon />,
+    name: "Banners",
+    path: "/banners",
+    allowedRoles: ["admin"],
+  },
+  {
+    icon: <DocsIcon />,
     name: "Invoices",
     path: "/invoice",
     allowedRoles: ["admin"],
@@ -66,13 +86,13 @@ const navItems: NavItem[] = [
     allowedRoles: ["admin"],
   },
   {
-    icon: <GridIcon />,
+    icon: <ChatIcon />,
     name: "Notifications & Coupons",
     path: "/notifications",
     allowedRoles: ["admin"],
   },
   {
-    icon: <GridIcon />,
+    icon: <PlugInIcon />,
     name: "Order Zone",
     path: "/zones",
     allowedRoles: ["admin"],
