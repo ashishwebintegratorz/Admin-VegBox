@@ -21,6 +21,8 @@ import NotificationsCoupons from "./pages/NotificationsCoupons";
 import CategoryManagement from "./pages/CategoryManagement";
 import BannerManagement from "./pages/BannerManagement";
 import CODManagement from "./pages/CODManagement";
+import ReportManagement from "./pages/ReportManagement";
+import RefundManagement from "./pages/RefundManagement";
 
 export default function App() {
   return (
@@ -153,6 +155,22 @@ export default function App() {
               element={
                 <ProtectedRoute allowedRoles={["admin"]}>
                   <TodayOrders />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/issues"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <ReportManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/refunds"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <RefundManagement />
                 </ProtectedRoute>
               }
             />

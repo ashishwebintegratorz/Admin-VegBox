@@ -222,4 +222,14 @@ export const adminUserService = {
     blockUser: (id: string) => api.put(`/user/block/${id}`),
 };
 
+export const issueService = {
+    getIssues: () => api.get("/issues/admin"),
+    resolveIssue: (id: string) => api.put(`/issues/${id}/resolve`),
+};
+
+export const refundService = {
+    getRefunds: () => api.get("/refunds"),
+    processRefund: (id: string) => api.put(`/refunds/${id}/process`),
+};
+
 export default api;
