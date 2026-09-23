@@ -191,6 +191,67 @@ export default function OrderDetails() {
         </div>
       </div>
 
+      {/* Order Status Tracker */}
+      <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
+        <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-8">Order Status</h2>
+        <div className="flex items-center justify-between w-full relative px-4">
+          <div className="absolute left-[10%] right-[10%] top-5 -translate-y-1/2 h-1 bg-slate-200 dark:bg-slate-700 -z-10" />
+          
+          {(() => {
+            let activeStep = 0;
+            if (order.deliveryStatus === 'delivered') activeStep = 2;
+            else if (order.deliveryStatus === 'assigned' || order.deliveryStatus === 'out_for_delivery') activeStep = 1;
+
+            return (
+              <>
+                <div 
+                  className="absolute left-[10%] top-5 -translate-y-1/2 h-1 bg-blue-500 -z-10 transition-all duration-500" 
+                  style={{ width: `${(activeStep / 2) * 80}%` }} 
+                />
+                
+                {['Placed', 'Assigned', 'Delivered'].map((step, idx) => {
+                  const isActive = activeStep >= idx;
+                  return (
+                    <div key={step} className="flex flex-col items-center gap-3 relative bg-white dark:bg-slate-900 px-2 min-w-[100px]">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors z-10 bg-white dark:bg-slate-900 ${isActive ? 'border-blue-500 text-blue-500' : 'border-slate-300 text-slate-400 dark:border-slate-600'}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isActive ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-400 dark:bg-slate-800'}`}>
+                          {idx === 0 && <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>}
+                          {idx === 1 && <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>}
+                          {idx === 2 && <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>}
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <span className={`text-sm font-bold ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}>{step}</span>
+                        {/* Assign Rider Action */}
+                        {idx === 1 && activeStep === 0 && (
+                          <div className="absolute top-16 mt-2 whitespace-nowrap">
+                            <Button 
+                              size="sm" 
+                              className="text-xs py-1.5 px-3 h-auto bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-500/20 dark:text-blue-400 dark:hover:bg-blue-500/30"
+                              onClick={() => {
+                                document.getElementById('assign-rider-section')?.scrollIntoView({ behavior: 'smooth' });
+                                // Add a highlight effect
+                                const el = document.getElementById('assign-rider-section');
+                                if (el) {
+                                  el.classList.add('ring-4', 'ring-blue-500', 'ring-opacity-50', 'transition-all');
+                                  setTimeout(() => el.classList.remove('ring-4', 'ring-blue-500', 'ring-opacity-50'), 2000);
+                                }
+                              }}
+                            >
+                              Assign Rider Now
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </>
+            );
+          })()}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Customer & Order Details Column */}
         <div className="lg:col-span-1 space-y-6">
@@ -255,9 +316,32 @@ export default function OrderDetails() {
           </div>
         </div>
 
-        {/* Rider Selection Column */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/50 flex flex-col h-full">
+        {/* Rider Selection Column or Delivery Details */}
+        {order.deliveryStatus === 'delivered' || order.status === 'cancelled' || order.deliveryStatus === 'out_for_delivery' ? (
+          <div className="lg:col-span-2 space-y-6">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Delivery Information</h2>
+              {order.assignedDriver ? (
+                <div className="flex items-center gap-4">
+                  <Avatar
+                    src={order.assignedDriver?.avatar}
+                    alt={order.assignedDriver?.name}
+                    nameForInitials={order.assignedDriver?.name}
+                    size={48}
+                  />
+                  <div>
+                    <p className="font-semibold text-slate-900 dark:text-white">{order.assignedDriver?.name || "Rider"}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{order.assignedDriver?.phone || "No phone"}</p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-slate-500 dark:text-slate-400">No rider was assigned to this order.</p>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="lg:col-span-2 space-y-6">
+            <div id="assign-rider-section" className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/50 flex flex-col h-full">
             <div className="mb-4">
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">Assign Rider</h2>
               <p className="text-sm text-slate-500 dark:text-slate-400">Select an available rider to assign this order.</p>
@@ -343,6 +427,7 @@ export default function OrderDetails() {
             </div>
           </div>
         </div>
+        )}
       </div>
 
       <div className="flex justify-end mt-4">

@@ -127,6 +127,9 @@ export const driverService = {
         api.put("/drivers/toggle-online", { isOnline }),
     reachedStore: () => api.put("/drivers/reached-store"),
     onboardDriver: (formData: FormData) => api.post("/drivers/onboard", formData),
+    getAllCODEstimates: () => api.get("/drivers/admin/cod-estimates"),
+    getDriverCODEstimate: (id: string) => api.get(`/drivers/${id}/cod-estimate`),
+    settleDriverCOD: (id: string) => api.post(`/drivers/${id}/settle-cod`),
 };
 
 export const orderService = {

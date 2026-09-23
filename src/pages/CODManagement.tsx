@@ -1,44 +1,24 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router";
-import PageBreadcrumb from "../components/common/PageBreadCrumb";
+import React, { useEffect, useState } from "react";
 import PageMeta from "../components/common/PageMeta";
-import Button from "../components/ui/button/Button";
-import Avatar from "../components/ui/avatar/Avatar";
+import PageBreadcrumb from "../components/common/PageBreadCrumb";
+import { driverService } from "../services/api";
 
 export default function CODManagement() {
   const [estimates, setEstimates] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const getToken = () => {
-    const userStr = localStorage.getItem("user");
-    if (!userStr) return null;
-    try {
-      const userData = JSON.parse(userStr);
-      return userData?.data?.accessToken || userData?.data?.token || userData?.accessToken || userData?.token;
-    } catch {
-      return null;
-    }
-  };
+  const [loading, setLoading] = useState(true);
+  const [selectedDriver, setSelectedDriver] = useState<any | null>(null);
+  const [driverDetails, setDriverDetails] = useState<any | null>(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
 
   const fetchEstimates = async () => {
-    setIsLoading(true);
     try {
-      const token = getToken();
-      const res = await fetch(`${import.meta.env.VITE_BASIC_API_URL}/drivers/admin/cod-estimates`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (res.ok) {
-        // Only show drivers who have a netAmountToAdmin > 0
-        const pending = data.data.filter((e: any) => e.netAmountToAdmin > 0);
-        setEstimates(pending);
-      } else {
-        alert(data.message);
-      }
-    } catch (err) {
-      console.error(err);
+      setLoading(true);
+      const res = await driverService.getAllCODEstimates();
+      setEstimates(res.data.data.filter((e: any) => e.netAmountToAdmin > 0));
+    } catch (error) {
+      console.error("Error fetching COD estimates:", error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -46,111 +26,171 @@ export default function CODManagement() {
     fetchEstimates();
   }, []);
 
-  const handleSettleCOD = async (driverId: string) => {
-    if (!window.confirm("Are you sure you want to settle the COD amount? This means you have received the cash from the driver.")) return;
+  const handleViewDetails = async (driverId: string) => {
     try {
-      const token = getToken();
-      const res = await fetch(`${import.meta.env.VITE_BASIC_API_URL}/drivers/${driverId}/settle-cod`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        alert("COD Settled Successfully!");
-        fetchEstimates(); // refresh list
-      } else {
-        const err = await res.json();
-        alert(err.message);
-      }
-    } catch (err) {
-      console.error(err);
+      setLoadingDetails(true);
+      setSelectedDriver(driverId);
+      const res = await driverService.getDriverCODEstimate(driverId);
+      setDriverDetails(res.data);
+    } catch (error) {
+      console.error("Error fetching driver details:", error);
+    } finally {
+      setLoadingDetails(false);
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-orange-500 border-t-transparent"></div>
-      </div>
-    );
-  }
+  const handleSettleCOD = async (driverId: string) => {
+    if (!window.confirm("Are you sure you have received the cash from this rider?")) return;
+    try {
+      await driverService.settleDriverCOD(driverId);
+      alert("COD Settled Successfully!");
+      setSelectedDriver(null);
+      setDriverDetails(null);
+      fetchEstimates();
+    } catch (error) {
+      console.error("Error settling COD:", error);
+      alert("Failed to settle COD.");
+    }
+  };
 
   return (
     <>
       <PageMeta
-        title="COD Management | Admin Panel"
-        description="Manage cash on delivery settlements from drivers"
+        title="COD Management | VegBox Admin"
+        description="Manage COD settlements from drivers"
       />
       <PageBreadcrumb pageTitle="COD Management" />
 
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">COD Settlements</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Drivers with pending cash on delivery amounts that need to be settled.
-            </p>
-          </div>
-          <Button variant="outline" onClick={fetchEstimates}>
-            Refresh List
-          </Button>
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        {/* Left Side: List of Drivers */}
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
+          <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">
+            Pending COD Settlements
+          </h3>
+
+          {loading ? (
+            <p>Loading...</p>
+          ) : estimates.length === 0 ? (
+            <p className="text-gray-500">No pending COD to settle.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
+                <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+                  <tr>
+                    <th className="px-4 py-3">Rider</th>
+                    <th className="px-4 py-3">Orders</th>
+                    <th className="px-4 py-3 text-right">Net Amount</th>
+                    <th className="px-4 py-3 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {estimates.map((est) => (
+                    <tr
+                      key={est.driver?._id}
+                      className={`border-b border-gray-200 dark:border-gray-700 ${
+                        selectedDriver === est.driver?._id ? "bg-orange-50 dark:bg-orange-900/20" : ""
+                      }`}
+                    >
+                      <td className="px-4 py-3">
+                        <div className="font-medium text-gray-900 dark:text-white">
+                          {est.driver?.name}
+                        </div>
+                        <div className="text-xs">{est.driver?.phone}</div>
+                      </td>
+                      <td className="px-4 py-3 text-center font-medium">
+                        {est.pendingOrderCount}
+                      </td>
+                      <td className="px-4 py-3 text-right font-medium text-orange-500">
+                        ₹{est.netAmountToAdmin}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <button
+                          onClick={() => handleViewDetails(est.driver?._id)}
+                          className="rounded border border-gray-300 px-3 py-1.5 text-xs font-medium hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
+                        >
+                          View Details
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
-        {estimates.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-200 bg-white p-12 text-center dark:border-gray-800 dark:bg-gray-900 shadow-sm">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/20">
-              <svg className="h-10 w-10 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h3 className="mt-4 text-lg font-bold text-gray-900 dark:text-white">All Settled Up!</h3>
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              There are no pending COD settlements right now.
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {estimates.map((estimate) => (
-              <div key={estimate.driver._id} className="rounded-2xl border border-orange-200 bg-orange-50 p-6 shadow-sm dark:border-orange-900/30 dark:bg-orange-900/10 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <Link to={`/driver/${estimate.driver._id}`} className="flex items-center gap-3 hover:opacity-80 transition">
-                      <Avatar src={estimate.driver.avatar} nameForInitials={estimate.driver.name} size={40} />
-                      <div>
-                        <h3 className="font-bold text-gray-900 dark:text-white">{estimate.driver.name}</h3>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{estimate.driver.phone}</p>
-                      </div>
-                    </Link>
-                    <span className="inline-flex items-center rounded-full bg-orange-200 px-2.5 py-1 text-xs font-bold text-orange-900">
-                      {estimate.pendingOrderCount} Orders
-                    </span>
-                  </div>
-                  
-                  <div className="space-y-3 mb-6">
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-600 dark:text-gray-400">Total Collected</span>
-                      <span className="font-semibold text-gray-900 dark:text-gray-200">₹{estimate.totalCODCollected}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-600 dark:text-gray-400">Driver Earnings</span>
-                      <span className="font-semibold text-red-600">- ₹{estimate.driverEarnings}</span>
-                    </div>
-                    <div className="pt-3 border-t border-orange-200 dark:border-orange-800 flex justify-between items-center">
-                      <span className="font-bold text-gray-900 dark:text-white">Net Payable</span>
-                      <span className="text-xl font-black text-orange-600">₹{estimate.netAmountToAdmin}</span>
-                    </div>
-                  </div>
-                </div>
+        {/* Right Side: Detailed View */}
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
+          <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">
+            Settlement Details
+          </h3>
 
-                <Button
-                  className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold"
-                  onClick={() => handleSettleCOD(estimate.driver._id)}
-                >
-                  Settle Cash
-                </Button>
+          {!selectedDriver ? (
+            <div className="flex h-40 items-center justify-center text-gray-400">
+              Select a rider from the list to view details
+            </div>
+          ) : loadingDetails ? (
+            <p>Loading details...</p>
+          ) : driverDetails ? (
+            <div>
+              <div className="mb-6 grid grid-cols-2 gap-4 rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
+                <div>
+                  <p className="text-sm text-gray-500">Total COD Collected</p>
+                  <p className="text-xl font-bold text-gray-900 dark:text-white">
+                    ₹{driverDetails.totalCODCollected}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Rider Earnings</p>
+                  <p className="text-xl font-bold text-gray-900 dark:text-white">
+                    - ₹{driverDetails.driverEarnings}
+                  </p>
+                </div>
+                <div className="col-span-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                  <p className="text-sm text-gray-500">Net Amount to Receive</p>
+                  <p className="text-3xl font-bold text-orange-500">
+                    ₹{driverDetails.netAmountToAdmin}
+                  </p>
+                </div>
               </div>
-            ))}
-          </div>
-        )}
+
+              <h4 className="mb-3 font-medium text-gray-800 dark:text-gray-200">
+                Order History ({driverDetails.orders?.length || 0})
+              </h4>
+              
+              <div className="max-h-[300px] overflow-y-auto pr-2">
+                {driverDetails.orders?.map((order: any) => (
+                  <div key={order._id} className="mb-3 flex items-center justify-between rounded-lg border border-gray-100 p-3 shadow-sm dark:border-gray-800">
+                    <div>
+                      <p className="font-medium text-sm text-gray-800 dark:text-gray-200">
+                        {order.orderNumber}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(order.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-gray-900 dark:text-white">
+                        ₹{order.payableAmount}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 border-t border-gray-200 pt-4 dark:border-gray-700">
+                <button
+                  onClick={() => handleSettleCOD(selectedDriver)}
+                  className="w-full rounded-lg bg-orange-500 px-4 py-3 font-medium text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                >
+                  Settle Cash Amount (₹{driverDetails.netAmountToAdmin})
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-red-500">Failed to load details.</p>
+          )}
+        </div>
       </div>
     </>
   );

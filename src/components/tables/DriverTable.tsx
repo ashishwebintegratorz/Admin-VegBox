@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -13,6 +13,7 @@ import Button from "../ui/button/Button";
 import OnboardDriverModal from "../form/OnboardDriverModal";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router";
+import { useSocket } from "../../context/SocketContext";
 
 type DriverRow = {
   _id: string;
@@ -37,6 +38,21 @@ export default function DriverTable() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const queryClient = useQueryClient();
   const driversPerPage = 10;
+  const { socket } = useSocket();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleDriverStatus = (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["drivers"] });
+    };
+
+    socket.on("driverStatusUpdated", handleDriverStatus);
+
+    return () => {
+      socket.off("driverStatusUpdated", handleDriverStatus);
+    };
+  }, [socket, queryClient]);
 
   const displayDrivers: DriverRow[] = Array.isArray(apiDrivers) ? apiDrivers : [];
 

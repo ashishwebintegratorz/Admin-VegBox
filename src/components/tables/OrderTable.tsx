@@ -248,7 +248,7 @@ export default function OrderTable() {
                           onClick={(e) => { e.stopPropagation(); navigate(`/orders/${order._id}`); }}
                           className="inline-flex items-center gap-1 rounded-lg border border-indigo-500/40 bg-indigo-600 px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-white shadow-lg shadow-indigo-500/20 transition hover:-translate-y-[1px] hover:bg-indigo-500 hover:shadow-indigo-500/40 active:scale-95"
                         >
-                          Assign / View
+                          {order.deliveryStatus === 'delivered' || order.status === 'cancelled' ? 'View' : 'Assign / View'}
                         </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); handleOpenManage(order); }}
