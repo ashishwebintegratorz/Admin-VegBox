@@ -88,11 +88,12 @@ export default function StatisticsChart() {
     },
     yaxis: {
       labels: {
-        style: {
-          fontSize: "12px", // Adjust font size for y-axis labels
-          colors: ["#6B7280"], // Color of the labels
+          formatter: (value: number) => value.toFixed(0),
+          style: {
+            fontSize: "12px", // Adjust font size for y-axis labels
+            colors: ["#6B7280"], // Color of the labels
+          },
         },
-      },
       title: {
         text: "", // Remove y-axis title
         style: {
@@ -138,3 +139,4 @@ export default function StatisticsChart() {
     </div>
   );
 }
+

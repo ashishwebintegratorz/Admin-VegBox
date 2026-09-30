@@ -64,9 +64,12 @@ export default function MonthlySalesChart() {
       fontFamily: "Outfit",
     },
     yaxis: {
-      title: {
-        text: undefined,
-      },
+        title: {
+          text: undefined,
+        },
+        labels: {
+          formatter: (value: number) => value.toFixed(0),
+        },
     },
     grid: {
       yaxis: {
@@ -142,3 +145,4 @@ export default function MonthlySalesChart() {
     </div>
   );
 }
+
