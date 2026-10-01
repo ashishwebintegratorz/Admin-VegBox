@@ -43,7 +43,7 @@ export default function DriverTable() {
   useEffect(() => {
     if (!socket) return;
 
-    const handleDriverStatus = (data: any) => {
+    const handleDriverStatus = () => {
       queryClient.invalidateQueries({ queryKey: ["drivers"] });
     };
 

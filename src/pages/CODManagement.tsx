@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PageMeta from "../components/common/PageMeta";
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
 import { driverService } from "../services/api";
@@ -195,3 +195,4 @@ export default function CODManagement() {
     </>
   );
 }
+
