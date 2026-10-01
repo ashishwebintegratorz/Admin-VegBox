@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router";
+import { HashRouter as Router, Routes, Route } from "react-router";
 import SignIn from "./pages/AuthPages/SignIn";
 import NotFound from "./pages/OtherPage/NotFound";
 import UserProfiles from "./pages/UserProfiles";
@@ -32,7 +32,14 @@ export default function App() {
         <Routes>
           {/* Dashboard Layout */}
           <Route element={<AppLayout />}>
-            <Route index element={<Home />} />
+            <Route 
+              index 
+              element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              } 
+            />
             
             <Route
               path="/users"
@@ -176,7 +183,14 @@ export default function App() {
             />
 
             {/* Others Page */}
-            <Route path="/profile" element={<UserProfiles />} />
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <UserProfiles />
+                </ProtectedRoute>
+              } 
+            />
           </Route>
 
           {/* Auth Layout */}

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Redirecting...</title>
+    <!-- Redirect to root so React HashRouter can take over -->
+    <meta http-equiv="refresh" content="0; URL='/'" />
+    <script>
+      // Also try to preserve the path as a hash if possible
+      var path = window.location.pathname;
+      if (path !== '/' && path !== '/index.html') {
+        window.location.replace('/#' + path);
+      } else {
+        window.location.replace('/');
+      }
+    </script>
+  </head>
+  <body>
+    Redirecting to application...
+  </body>
+</html>
