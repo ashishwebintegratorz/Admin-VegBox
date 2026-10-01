@@ -169,7 +169,7 @@ export const productService = {
 
 export const categoryService = {
     listCategories: () => api.get("/categories"),
-    createCategory: (data: FormData) => api.post("/categories/add", data, {
+    createCategory: (data: FormData) => api.post("/categories", data, {
         headers: { 'Content-Type': 'multipart/form-data' }
     }),
     updateCategory: (id: string, data: FormData) => api.put(`/categories/${id}`, data, {
