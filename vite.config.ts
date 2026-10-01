@@ -15,4 +15,14 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    chunkSizeWarningLimit: 3000, // Suppress chunk size warning
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router', 'axios'],
+        },
+      },
+    },
+  },
 });
