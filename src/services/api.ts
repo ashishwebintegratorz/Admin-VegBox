@@ -93,7 +93,13 @@ api.interceptors.response.use(
             }
         }
 
-        return Promise.reject(error);
+        const safeError = new Error(
+            error.response?.data?.message || error.message || "An unexpected error occurred"
+        );
+        (safeError as any).status = error.response?.status;
+        (safeError as any).data = error.response?.data;
+        
+        return Promise.reject(safeError);
     }
 );
 
