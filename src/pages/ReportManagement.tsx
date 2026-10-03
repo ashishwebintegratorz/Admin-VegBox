@@ -55,6 +55,18 @@ const ReportManagement = () => {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this issue ticket?')) return;
+    try {
+      const res = await issueService.deleteIssue(id);
+      if (res.data.success) {
+        setIssues(issues.filter(issue => issue._id !== id));
+      }
+    } catch (error) {
+      console.error('Error deleting issue:', error);
+    }
+  };
+
   return (
     <>
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -135,14 +147,22 @@ const ReportManagement = () => {
                       </p>
                     </td>
                     <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                      {issue.status === 'open' && (
+                      <div className="flex items-center space-x-2">
+                        {issue.status === 'open' && (
+                          <button
+                            onClick={() => handleResolve(issue._id)}
+                            className="rounded bg-blue-600 py-1.5 px-4 text-sm font-medium text-white hover:bg-blue-700 transition"
+                          >
+                            Mark Resolved
+                          </button>
+                        )}
                         <button
-                          onClick={() => handleResolve(issue._id)}
-                          className="rounded bg-primary py-1 px-3 text-sm text-white hover:bg-opacity-90 transition"
+                          onClick={() => handleDelete(issue._id)}
+                          className="rounded bg-red-600 py-1.5 px-4 text-sm font-medium text-white hover:bg-red-700 transition"
                         >
-                          Mark Resolved
+                          Delete
                         </button>
-                      )}
+                      </div>
                     </td>
                   </tr>
                 ))

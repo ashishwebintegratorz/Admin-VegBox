@@ -234,6 +234,7 @@ export const adminUserService = {
 export const issueService = {
     getIssues: () => api.get("/issues/admin"),
     resolveIssue: (id: string) => api.put(`/issues/${id}/resolve`),
+    deleteIssue: (id: string) => api.delete(`/issues/${id}`),
 };
 
 export const refundService = {
